@@ -1,0 +1,3 @@
+* suss
+  suss is a very sus dialect of Lisp named in honor of Gerald Jay Sussman, co-author of the scheme dialect.
+  
