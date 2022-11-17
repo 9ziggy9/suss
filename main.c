@@ -36,7 +36,10 @@ typedef struct {
 
 typedef enum {
   INST_PUSH,
-  INST_PLUS
+  INST_PLUS,
+  INST_MINUS,
+  INST_MULT,
+  INST_DIV,
 } Inst_t;
 
 typedef struct {
@@ -46,12 +49,25 @@ typedef struct {
 
 #define MAKE_INST_PUSH(value) {.type = INST_PUSH, .operand = value}
 #define MAKE_INST_PLUS() {.type = INST_PLUS}
+#define MAKE_INST_MINUS(value) {.type = INST_MINUS}
+#define MAKE_INST_MULT() {.type = INST_MULT}
+#define MAKE_INST_DIV() {.type = INST_DIV}
+
 #define ARRAY_SIZE(xs) (sizeof(xs) / sizeof((xs)[0]))
 
 Inst program[] = {
   MAKE_INST_PUSH(60),
   MAKE_INST_PUSH(40),
-  MAKE_INST_PLUS()
+  MAKE_INST_PLUS(),
+  MAKE_INST_PUSH(60),
+  MAKE_INST_PUSH(40),
+  MAKE_INST_MINUS(),
+  MAKE_INST_PUSH(10),
+  MAKE_INST_PUSH(2),
+  MAKE_INST_DIV(),
+  MAKE_INST_PUSH(10),
+  MAKE_INST_PUSH(2),
+  MAKE_INST_MULT()
 };
 
 Svm svm = {0};
@@ -69,6 +85,27 @@ Trap svm_execute_inst(Svm *svm, Inst inst) {
       return TRAP_STACK_UNDERFLOW;
     }
     svm->stack[svm->stack_size - 2] += svm->stack[svm->stack_size - 1];
+    svm->stack_size--;
+    break;
+  case INST_MINUS:
+    if (svm->stack_size < 2) {
+      return TRAP_STACK_UNDERFLOW;
+    }
+    svm->stack[svm->stack_size - 2] -= svm->stack[svm->stack_size - 1];
+    svm->stack_size--;
+    break;
+  case INST_MULT:
+    if (svm->stack_size < 2) {
+      return TRAP_STACK_UNDERFLOW;
+    }
+    svm->stack[svm->stack_size - 2] *= svm->stack[svm->stack_size - 1];
+    svm->stack_size--;
+    break;
+  case INST_DIV:
+    if (svm->stack_size < 2) {
+      return TRAP_STACK_UNDERFLOW;
+    }
+    svm->stack[svm->stack_size - 2] /= svm->stack[svm->stack_size - 1];
     svm->stack_size--;
     break;
   default:
