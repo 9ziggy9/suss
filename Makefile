@@ -1,12 +1,12 @@
 CFLAGS=-Wall -Wconversion -pedantic
-LIBS=-ledit -lm
+LIBS=-ledit
 OBJS=./build/mpc.o
 
 all: mpc
-	$(CC) $(CFLAGS) $(LIBS) main.c -o ./suss
+	$(CC) $(CFLAGS) $(LIBS) main.c $(OBJS) -o ./suss
 
 mpc: mpc.c
-	$(CC) $(CFLAGS) $(LIBS) mpc.c -c -o ./build/mpc.o
+	$(CC) $(CFLAGS) -lm mpc.c -c -o ./build/mpc.o
 
 clean:
 	rm -rf ./suss ./build/*
