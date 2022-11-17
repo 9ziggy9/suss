@@ -13,7 +13,7 @@ void echo_args(int argc, char **argv) {
 }
 
 // OPT FUNCTIONS
-void opt_help() {
+void opt_help(void) {
   printf("\n--- HELP ---\n");
   printf("How to use suss: just use it.\n");
 }
@@ -52,10 +52,13 @@ void opts(int argc, char **argv) {
   }
 }
 
-int main(int argc, char **argv) {
+void intro(void) {
   puts("Suss Version 0.0.1\n");
   puts("Press Ctrl+c to exit\n");
+}
 
+int main(int argc, char **argv) {
+  intro();
   while(1) {
     char *input = readline(">>> ");
     add_history(input);
