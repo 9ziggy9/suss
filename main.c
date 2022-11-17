@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
+#include <editline/readline.h>
 
 // FOR DEBUGGING COMMAND LINE ARGS
 void echo_args(int argc, char **argv) {
@@ -51,7 +53,18 @@ void opts(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-  echo_args(argc, argv);
-  opts(argc, argv);
+  puts("Suss Version 0.0.1\n");
+  puts("Press Ctrl+c to exit\n");
+
+  while(1) {
+    char *input = readline(">>> ");
+    add_history(input);
+    printf("No, you're a %s\n", input);
+
+    // DEALLOCATE RESOURCES
+    // TODO: I want to eventually implement memory management library
+    // remember to look into ARENA.
+    free(input);
+  }
   return 0;
 }

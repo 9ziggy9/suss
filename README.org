@@ -1,3 +1,20 @@
 * suss
   suss is a very sus dialect of Lisp named in honor of Gerald Jay Sussman, co-author of the scheme dialect.
-  
+** Dependencies
+Not happy about these.
+*** libedit
+#+BEGIN_SRC console
+sudo pacman -S libedit
+#+END_SRC
+Link with -ledit
+** REFERENCES
+*** Build Your Own Lisp (primary reference)
+https://www.buildyourownlisp.com/chapter2_installation
+*** GDB tutorial
+http://web.archive.org/web/20140910051410/http://www.dirac.org/linux/gdb/
+*** getopt()
+Note that I have deviated from using c99 standard due to absence of getopt in unistd.h
+https://www.geeksforgeeks.org/getopt-function-in-c-to-parse-command-line-arguments/
+
+*** General C Info
+https://en.cppreference.com/w/c
