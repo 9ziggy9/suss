@@ -3,6 +3,7 @@
 ** Dependencies
 Not happy about these.
 *** libedit
+This is incredibly useful, I must admit. It appears (?) to have come pre-installed on my distribution (Arch Linux). This allows us to press up to move through command history in our interpreter. Evidently, this does not rely on ncurses or termcap which should actually reduce size. I think I will eventually statically link with this if I have to.
 #+BEGIN_SRC console
 sudo pacman -S libedit
 #+END_SRC
