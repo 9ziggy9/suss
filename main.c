@@ -12,16 +12,29 @@ void echo_args(int argc, char **argv) {
 
 // OPT FUNCTIONS
 void opt_help() {
-  assert(0 && "HELP INFO NOT YET IMPLEMENTED");
+  printf("\n--- HELP ---\n");
+  printf("How to use suss: just use it.\n");
+}
+void opt_filepath(char *path) {
+  printf("\nUSING FILE PATH: %s\n", path);
+}
+void opt_output(char *path) {
+  printf("\nOUTPUTTING TO: %s\n", path);
 }
 
 // HANDLE COMMAND LINE ARGS
 void opts(int argc, char **argv) {
   int opt;
-  while ((opt = getopt(argc, argv, "h")) != -1) {
+  while ((opt = getopt(argc, argv, "hf:o:")) != -1) {
     switch(opt) {
     case 'h':
       opt_help();
+      break;
+    case 'f':
+      opt_filepath(optarg);
+      break;
+    case 'o':
+      opt_output(optarg);
       break;
     case ':':
       printf("Option needs value\n");
