@@ -60,40 +60,16 @@ void intro(void) {
 
 
 int main(int argc, char **argv) {
-  // BEGIN PARSER
-  mpc_parser_t* Number	 = mpc_new("number");
-  mpc_parser_t* Operator = mpc_new("operator");
-  mpc_parser_t* Expr	 = mpc_new("expr");
-  mpc_parser_t* Suss	 = mpc_new("suss");
-
-  mpca_lang(MPCA_LANG_DEFAULT,
-	    "					                        \
-	      number   : /-?[0-9]+/ ;			                \
-	      operator : '+' | '-' | '*' | '/' ;	                \
-	      expr     : <number> | '(' <operator> <expr>+ ')' ;	\
-	      suss     : /^/ <operator> <expr>+ /$/ ;	                \
-            ", Number, Operator, Expr, Suss);
-  // END PARSER
-
   intro();
-
   while(1) {
     char *input = readline(">>> ");
     add_history(input);
+    printf("No, you're a %s\n", input);
 
-    mpc_result_t r;
-    if (mpc_parse("<stdin>", input, Suss, &r)) {
-      mpc_ast_print(r.output);
-      mpc_ast_delete(r.output);
-    } else {
-      mpc_err_print(r.error);
-      mpc_err_delete(r.error);
-    }
     // DEALLOCATE RESOURCES
     // TODO: I want to eventually implement memory management library
     // remember to look into ARENA.
     free(input);
   }
-  mpc_cleanup(4, Number, Operator, Expr, Suss);
   return 0;
 }
