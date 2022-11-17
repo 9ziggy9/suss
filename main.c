@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <editline/readline.h>
+#include "mpc.h"
 
 // FOR DEBUGGING COMMAND LINE ARGS
 void echo_args(int argc, char **argv) {
@@ -56,6 +57,9 @@ void intro(void) {
   puts("Suss Version 0.0.1\n");
   puts("Press Ctrl+c to exit\n");
 }
+
+// BEGIN PARSER
+// END PARSER
 
 int main(int argc, char **argv) {
   intro();
