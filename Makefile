@@ -1,8 +1,14 @@
-CFLAGS=-Wall -Wconversion -pedantic
+CFLAGS=-Wall -Wconversion -pedantic -Wextra
 LIBS=-ledit
 
 all: main.c
-	$(CC) $(CFLAGS) $(LIBS) main.c -o ./suss
+	$(CC) $(CFLAGS) main.c -o ./test
+
+prc: main.c
+	$(CC) $(CFLAGS) -E -dD main.c -o ./test.prc
+
+interpreter: suss.c
+	$(CC) $(CFLAGS) $(LIBS) suss.c -o ./suss
 
 clean:
-	rm -rf ./suss
+	rm -rf ./suss ./test

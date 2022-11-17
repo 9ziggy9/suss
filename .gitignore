@@ -1,2 +1,4 @@
 suss
 build/
+test
+*.prc

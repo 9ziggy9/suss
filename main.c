@@ -1,75 +1,105 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <stdint.h>
 #include <assert.h>
-#include <editline/readline.h>
-#include "mpc.h"
 
-// FOR DEBUGGING COMMAND LINE ARGS
-void echo_args(int argc, char **argv) {
-  printf("argc %d\n", argc);
-  for (int i = 0; i < argc; i++) {
-    printf("argv[%d]: %s\n", i, argv[i]);
+#define STACK_CAPACITY 1024
+
+typedef int64_t Word;
+
+typedef enum {
+  TRAP_OK = 0,
+  TRAP_STACK_OVERFLOW,
+  TRAP_STACK_UNDERFLOW,
+  TRAP_ILLEGAL_INST
+} Trap;
+
+const char *trap_as_cstr(Trap trap) {
+  switch (trap) {
+  case TRAP_OK:
+    return "TRAP_OK";
+  case TRAP_STACK_OVERFLOW:
+    return "TRAP_STACK_OVERFLOW";
+  case TRAP_STACK_UNDERFLOW:
+    return "TRAP_STACK_UNDERFLOW";
+  case TRAP_ILLEGAL_INST:
+    return "TRAP_ILLEGAL_INST";
+  default:
+    assert(0 && "WTF");
   }
 }
 
-// OPT FUNCTIONS
-void opt_help(void) {
-  printf("\n--- HELP ---\n");
-  printf("How to use suss: just use it.\n");
-}
-void opt_filepath(char *path) {
-  printf("\nUSING FILE PATH: %s\n", path);
-}
-void opt_output(char *path) {
-  printf("\nOUTPUTTING TO: %s\n", path);
-}
+typedef struct {
+  Word stack[STACK_CAPACITY];
+  size_t stack_size;
+} Svm;
 
-// HANDLE COMMAND LINE ARGS
-void opts(int argc, char **argv) {
-  int opt;
-  while ((opt = getopt(argc, argv, "hf:o:")) != -1) {
-    switch(opt) {
-    case 'h':
-      opt_help();
-      break;
-    case 'f':
-      opt_filepath(optarg);
-      break;
-    case 'o':
-      opt_output(optarg);
-      break;
-    case ':':
-      printf("Option needs value\n");
-      break;
-    case '?':
-      printf("Uknown option: %c\n", optopt);
-      break;
+typedef enum {
+  INST_PUSH,
+  INST_PLUS
+} Inst_t;
+
+typedef struct {
+  Inst_t type;
+  Word operand;
+} Inst;
+
+#define MAKE_INST_PUSH(value) {.type = INST_PUSH, .operand = value}
+#define MAKE_INST_PLUS() {.type = INST_PLUS}
+#define ARRAY_SIZE(xs) (sizeof(xs) / sizeof((xs)[0]))
+
+Inst program[] = {
+  MAKE_INST_PUSH(60),
+  MAKE_INST_PUSH(40),
+  MAKE_INST_PLUS()
+};
+
+Svm svm = {0};
+
+Trap svm_execute_inst(Svm *svm, Inst inst) {
+  switch (inst.type) {
+  case INST_PUSH:
+    if (svm->stack_size >= STACK_CAPACITY) {
+      return TRAP_STACK_OVERFLOW;
     }
+    svm->stack[svm->stack_size++] = inst.operand;
+    break;
+  case INST_PLUS:
+    if (svm->stack_size < 2) {
+      return TRAP_STACK_UNDERFLOW;
+    }
+    svm->stack[svm->stack_size - 2] += svm->stack[svm->stack_size - 1];
+    svm->stack_size--;
+    break;
+  default:
+    return TRAP_ILLEGAL_INST;
   }
-  // Extra args
-  for (; optind < argc; optind++) {
-    printf("Extra arguments: %s\n", argv[optind]);
-  }
+  return TRAP_OK;
 }
 
-void intro(void) {
-  puts("Suss Version 0.0.1\n");
-  puts("Press Ctrl+c to exit\n");
+void svm_dump(FILE *stream, const Svm *svm) {
+  fprintf(stream, "Stack:\n");
+  if (svm->stack_size > 0) {
+    for (size_t i = 0; i < svm->stack_size; i++) {
+      fprintf(stream, "\t%ld\n", svm->stack[i]);
+    }
+  } else {
+    fprintf(stream, "\t<empty>\n");
+  }
 }
-
 
 int main(int argc, char **argv) {
-  intro();
-  while(1) {
-    char *input = readline(">>> ");
-    add_history(input);
-    printf("No, you're a %s\n", input);
+  printf("%d %p\n", argc, (void *)argv);
 
-    // DEALLOCATE RESOURCES
-    // TODO: I want to eventually implement memory management library
-    // remember to look into ARENA.
-    free(input);
+  svm_dump(stdout, &svm);
+  for (size_t i = 0; i < ARRAY_SIZE(program); i++) {
+    Trap trap = svm_execute_inst(&svm, program[i]);
+    if (trap != TRAP_OK) {
+      fprintf(stderr, "Trap activated: %s\n", trap_as_cstr(trap));
+      svm_dump(stderr, &svm);
+      exit(1);
+    }
   }
+  svm_dump(stdout, &svm);
   return 0;
 }
