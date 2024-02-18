@@ -1,6 +1,11 @@
 CFLAGS=-Wall -Wconversion -pedantic -Wextra
 LIBS=-ledit
 
+run: clean all
+	@echo "\n"
+	@echo "Running ... \n"
+	./test
+
 all: main.c
 	$(CC) $(CFLAGS) main.c -o ./test
 
